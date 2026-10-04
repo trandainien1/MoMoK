@@ -52,6 +52,7 @@ source tree.
 - `README.md` — replacement reproduction-only README
 - `UPSTREAM_README.md` — original official README preserved for attribution
 - `REPRODUCTION_CHANGES.md` — scope and semantic-change audit
+- `IMPLEMENTATION_REVIEW.md` — public implementation/provenance review
 
 ## D — Generated evidence (excluded)
 
