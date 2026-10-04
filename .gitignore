@@ -1,2 +1,18 @@
 __pycache__/
 .DS_Store
+# Local credentials and environment files
+.secrets/
+*.env
+kaggle.json
+
+# Local experiment state and generated outputs
+wandb/
+.wandb/
+**/wandb/
+*.pt
+*.pth
+checkpoints/
+kaggle_outputs/
+*.log
+__pycache__/
+*.pyc

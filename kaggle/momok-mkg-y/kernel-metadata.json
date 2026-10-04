@@ -1,0 +1,15 @@
+{
+  "id": "nientrandai1/momok-mkg-y-reproduction",
+  "title": "MoMoK MKG-Y Reproduction",
+  "code_file": "momok_mkgy_reproduction.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaA100",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

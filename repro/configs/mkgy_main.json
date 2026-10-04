@@ -1,0 +1,44 @@
+{
+  "dataset": "MKG-Y",
+  "source_commit": "99c2df114d48c79708ea0608644b685183d81bd9",
+  "config_source": "OFFICIAL_README_PLUS_PINNED_DEFAULTS",
+  "seed": 10010,
+  "lr": 0.0005,
+  "mu": 0.0001,
+  "dim": 300,
+  "batch_size": 1024,
+  "n_exp": 3,
+  "epochs": 2000,
+  "eval_freq": 100,
+  "save": 1,
+  "gamma": 1.0,
+  "paper_metrics": {
+    "MRR": 0.3791,
+    "Hits@1": 0.3509,
+    "Hits@3": 0.392,
+    "Hits@10": 0.432
+  },
+  "dataset_fingerprint": {
+    "entities": 15000,
+    "relations": 28,
+    "train": 21310,
+    "valid": 2665,
+    "test": 2663,
+    "image_num": 14244,
+    "image_dim": 383,
+    "text_num": 12305,
+    "text_dim": 384
+  },
+  "kernel": {
+    "owner": "nientrandai1",
+    "slug": "momok-mkg-y-reproduction",
+    "title": "MoMoK MKG-Y Reproduction",
+    "accelerator": "NvidiaTeslaA100"
+  },
+  "wandb": {
+    "entity": "trandainien1",
+    "project": "graphml-momok-reproduction",
+    "group": "main",
+    "run_name": "momok-mkgy-main-kaggle-v1-seed10010"
+  }
+}
