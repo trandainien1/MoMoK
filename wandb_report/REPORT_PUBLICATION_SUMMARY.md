@@ -1,0 +1,24 @@
+# W&B Main Result Report Publication
+
+- Report title: MoMoK — Main Result Reproduction
+- Report URL: https://wandb.ai/trandainien1/graphml-momok-reproduction/reports/MoMoK-—-Main-Result-Reproduction--VmlldzoxODA0ODgwMw==
+- Project URL: https://wandb.ai/trandainien1/graphml-momok-reproduction
+- MKG-W run: https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/k2evocuw
+- MKG-Y run: https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/tp1184w7
+- MKG-W tracking mode: retrospective_import_from_kaggle_logs
+- MKG-Y tracking mode: live_kaggle
+- Source commit: 99c2df114d48c79708ea0608644b685183d81bd9
+- MKG-Y checkpoint SHA256: db2e47779049d569dda58810b9f8b3aa5e0f4da52b2a9c02677ba399510e7785
+- Report update: PROGRAMMATIC_IN_PLACE_UPDATE
+- Raw ID filter: NO
+- Error 1054: ABSENT_FROM_UPDATED_SPEC
+- HTTP public page: 200
+- Browser visual verification: UNAVAILABLE_IN_CURRENT_TOOL_ENVIRONMENT
+- No accessToken URL is used.
+- Public reproduction repository: https://github.com/trandainien1/MoMoK
+- Stable reproduction tag: https://github.com/trandainien1/MoMoK/tree/course-momok-main-results-v1
+- Publication branch: `course-reproduction`
+- Publication commit: `0be7453e42e34277eb023e2ee3d1e5d3dc7672cf`
+- MKG-W run selector context: one `PanelGrid` runset context
+- MKG-Y training-loss panel: unchanged
+- Reproduction procedure: starts from public Git clone and stable tag
