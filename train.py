@@ -54,7 +54,13 @@ def parse_args():
         'mu': 0.0001,
         'img_dim': 256,
         'txt_dim': 256,
-        'variant': 'full'
+        'variant': 'full',
+        'max_train_batches': 0,
+        'resume_checkpoint': '',
+        'output_dir': '',
+        'run_mode': 'full',
+        'metric_policy': 'legacy',
+        'wandb_mode': 'disabled'
     }
 
     parser = argparse.ArgumentParser()
@@ -127,7 +133,10 @@ def train_decoder(args):
         epoch_mi_loss = []
         t = time.time()
         corpus.shuffle()
-        for batch_num in range(corpus.max_batch_num):
+        batch_limit = corpus.max_batch_num
+        if args.max_train_batches:
+            batch_limit = min(batch_limit, args.max_train_batches)
+        for batch_num in range(batch_limit):
             # Training the KGC model
             if estimator is not None:
                 estimator.eval()

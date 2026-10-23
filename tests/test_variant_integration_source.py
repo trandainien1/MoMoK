@@ -21,6 +21,8 @@ class VariantIntegrationSourceTests(unittest.TestCase):
         self.assertIn("resolve_variant", source)
         self.assertIn("args.variant_config", source)
         self.assertIn("estimator_should_run", source)
+        self.assertIn("max_train_batches", source)
+        self.assertIn("resume_checkpoint", source)
 
     def test_evaluator_uses_model_selected_heads(self):
         source = (ROOT / "utils" / "data_loader.py").read_text()
