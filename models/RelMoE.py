@@ -33,11 +33,12 @@ class PWLayer(nn.Module):
 class MoEAdaptorLayer(nn.Module):
     """MoE-enhanced Adaptor
     """
-    def __init__(self, n_exps, layers, dropout=0.0, noise=True):
+    def __init__(self, n_exps, layers, dropout=0.0, noise=True, use_relation_temperature=True):
         super(MoEAdaptorLayer, self).__init__()
 
         self.n_exps = n_exps
         self.noisy_gating = noise
+        self.use_relation_temperature = use_relation_temperature
 
         self.experts = nn.ModuleList([PWLayer(layers[0], layers[1], dropout) for i in range(n_exps)])
         self.w_gate = nn.Parameter(torch.zeros(layers[0], n_exps), requires_grad=True)
@@ -52,7 +53,7 @@ class MoEAdaptorLayer(nn.Module):
             logits = noisy_logits
         else:
             logits = clean_logits
-        if r is not None:
+        if r is not None and self.use_relation_temperature:
             gates = F.softmax(logits / torch.sigmoid(r), dim=-1)
         else:
             gates = F.softmax(logits, dim=-1)
@@ -78,7 +79,7 @@ from layers.layer import *
 from .model import BaseModel
 
 class ModalFusionLayer(nn.Module):
-    def __init__(self, in_dim, out_dim, multi, img_dim, txt_dim):
+    def __init__(self, in_dim, out_dim, multi, img_dim, txt_dim, fusion_mode="adaptive"):
         super(ModalFusionLayer, self).__init__()
 
         self.in_dim = in_dim
@@ -86,6 +87,7 @@ class ModalFusionLayer(nn.Module):
         self.multi = multi
         self.img_dim = img_dim
         self.text_dim = txt_dim
+        self.fusion_mode = fusion_mode
 
         modal1 = []
         for _ in range(self.multi):
@@ -120,7 +122,10 @@ class ModalFusionLayer(nn.Module):
             x_modal3 = self.modal3_layers[i](modal3_emb)
             x_stack = torch.stack((x_modal1, x_modal2, x_modal3), dim=1)
             attention_scores = self.ent_attn(x_stack).squeeze(-1)
-            attention_weights = torch.softmax(attention_scores, dim=-1)
+            if self.fusion_mode == "equal":
+                attention_weights = torch.full_like(attention_scores, 1.0 / 3.0)
+            else:
+                attention_weights = torch.softmax(attention_scores, dim=-1)
             context_vectors = torch.sum(attention_weights.unsqueeze(-1) * x_stack, dim=1)
             x_mm.append(context_vectors)
         x_mm = torch.stack(x_mm, dim=1)
@@ -156,6 +161,23 @@ class ModalFusionLayer(nn.Module):
 class RelMoE(BaseModel):
     def __init__(self, args):
         super(RelMoE, self).__init__(args)
+        variant = getattr(args, "variant_config", None)
+        self.variant_config = variant
+        self.training_head_names = tuple(
+            getattr(variant, "active_heads", ("structure", "image", "text", "joint"))
+        )
+        if variant is not None and not variant.train_joint_head and "joint" in self.training_head_names:
+            self.training_head_names = tuple(
+                head for head in self.training_head_names if head != "joint"
+            )
+        self.evaluation_head_indices = tuple(
+            {"structure": 0, "image": 1, "text": 2, "joint": 3}[head]
+            for head in getattr(variant, "active_heads", ("structure", "image", "text", "joint"))
+            if getattr(variant, "infer_joint_head", True) or head != "joint"
+        )
+        use_noise = getattr(variant, "use_gating_noise", True)
+        use_temperature = getattr(variant, "use_relation_temperature", True)
+        fusion_mode = getattr(variant, "fusion_mode", "adaptive")
         self.entity_embeddings = nn.Embedding(
             len(args.entity2id),
             args.dim,
@@ -248,24 +270,26 @@ class RelMoE(BaseModel):
         self.TuckER_MM = TuckERLayer(args.dim, self.fuse_out_dim)
         # Multi-modal fusion layers
 
-        self.visual_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.img_dim, self.img_dim])
-        self.text_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.txt_dim, self.txt_dim])
-        self.structure_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.dim, self.dim])
-        self.mm_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.fuse_out_dim, self.fuse_out_dim])
+        self.visual_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.img_dim, self.img_dim], noise=use_noise, use_relation_temperature=use_temperature)
+        self.text_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.txt_dim, self.txt_dim], noise=use_noise, use_relation_temperature=use_temperature)
+        self.structure_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.dim, self.dim], noise=use_noise, use_relation_temperature=use_temperature)
+        self.mm_moe = MoEAdaptorLayer(n_exps=args.n_exp, layers=[self.fuse_out_dim, self.fuse_out_dim], noise=use_noise, use_relation_temperature=use_temperature)
     
         self.fuse_e = ModalFusionLayer(
             in_dim=args.dim,
             out_dim=self.fuse_out_dim,
             multi=2,
             img_dim=self.img_dim,
-            txt_dim=self.txt_dim
+            txt_dim=self.txt_dim,
+            fusion_mode=fusion_mode
         )
         self.fuse_r = ModalFusionLayer(
             in_dim=args.r_dim,
             out_dim=self.fuse_out_dim,
             multi=2,
             img_dim=args.r_dim,
-            txt_dim=args.r_dim
+            txt_dim=args.r_dim,
+            fusion_mode=fusion_mode
         )
         self.bias = nn.Parameter(torch.zeros(len(args.entity2id)))
         self.bceloss = nn.BCELoss()
@@ -316,8 +340,11 @@ class RelMoE(BaseModel):
 
 
     def loss_func(self, output, target):
-        loss_s = self.bceloss(output[0], target)
-        loss_i = self.bceloss(output[1], target)
-        loss_d = self.bceloss(output[2], target)
-        loss_mm = self.bceloss(output[3], target)
-        return loss_s + loss_i + loss_d + loss_mm
+        head_indices = {"structure": 0, "image": 1, "text": 2, "joint": 3}
+        losses = [
+            self.bceloss(output[head_indices[name]], target)
+            for name in self.training_head_names
+        ]
+        if not losses:
+            raise RuntimeError("variant has no supervised prediction heads")
+        return sum(losses)

@@ -169,7 +169,8 @@ class ConvECorpus(Corpus):
                 att_i.append((h, r, t, atti))
                 att_t.append((h, r, t, attt))
                 att_mm.append((h, r, t, attmm))
-            pred = (pred[0] + pred[1] + pred[2] + pred[3]) / 4.0
+            selected_heads = getattr(model, 'evaluation_head_indices', (0, 1, 2, 3))
+            pred = sum(pred[index] for index in selected_heads) / len(selected_heads)
             label = [np.int32(indice['label']) for indice in head_batch]
             y = np.zeros((len(head_batch), len(self.entity2id)), dtype=np.float32)
             for idx in range(len(label)):
@@ -211,7 +212,8 @@ class ConvECorpus(Corpus):
                 att_i.append((h, r, t, atti))
                 att_t.append((h, r, t, attt))
                 att_mm.append((h, r, t, attmm))
-            pred = (pred[0] + pred[1] + pred[2] + pred[3]) / 4.0
+            selected_heads = getattr(model, 'evaluation_head_indices', (0, 1, 2, 3))
+            pred = sum(pred[index] for index in selected_heads) / len(selected_heads)
             label = [np.int32(indice['label']) for indice in tail_batch]
             y = np.zeros((len(tail_batch), len(self.entity2id)), dtype=np.float32)
             for idx in range(len(label)):

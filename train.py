@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
+from ablations.runtime_contract import estimator_should_run
+from ablations.variants import resolve_variant
 from models.RelMoE import RelMoE
 from models.model import *
 from models.modules import MIEstimator
@@ -51,7 +53,8 @@ def parse_args():
         'n_exp': 3,
         'mu': 0.0001,
         'img_dim': 256,
-        'txt_dim': 256
+        'txt_dim': 256,
+        'variant': 'full'
     }
 
     parser = argparse.ArgumentParser()
@@ -61,6 +64,7 @@ def parse_args():
     return args
 
 args = parse_args()
+args.variant_config = resolve_variant(args.variant, n_exp=args.n_exp, mu=args.mu)
 print(args)
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
@@ -93,16 +97,21 @@ def train_decoder(args):
     model = model_name[args.model](args)
     args.img_dim = model.img_dim
     args.txt_dim = model.txt_dim
-    estimator = MIEstimator(args)
+    estimator = MIEstimator(args) if estimator_should_run(args.variant_config) else None
     print(str(model))
     optimizer = torch.optim.Adam(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, args.gamma)
-    optimizer_mi = torch.optim.Adam(params=estimator.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    optimizer_mi = (
+        torch.optim.Adam(params=estimator.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+        if estimator is not None
+        else None
+    )
     tot_params = sum([np.prod(p.size()) for p in model.parameters()])
     print(f'Total number of parameters: {tot_params}')
     if args.cuda is not None and int(args.cuda) >= 0:
         model = model.to(args.device)
-        estimator = estimator.to(args.device)
+        if estimator is not None:
+            estimator = estimator.to(args.device)
 
     # Train Model
     t_total = time.time()
@@ -120,7 +129,8 @@ def train_decoder(args):
         corpus.shuffle()
         for batch_num in range(corpus.max_batch_num):
             # Training the KGC model
-            estimator.eval()
+            if estimator is not None:
+                estimator.eval()
             optimizer.zero_grad()
             train_indices, train_values = corpus.get_batch(batch_num)
             train_indices = torch.LongTensor(train_indices)
@@ -128,17 +138,22 @@ def train_decoder(args):
                 train_indices = train_indices.to(args.device)
                 train_values = train_values.to(args.device)
             output, embeddings = model.forward(train_indices)
-            loss = model.loss_func(output, train_values) + args.mu * estimator(embeddings)
+            loss = model.loss_func(output, train_values)
+            if estimator is not None:
+                loss = loss + args.mu * estimator(embeddings)
             loss.backward()
             optimizer.step()
             # Train the estimator
-            estimator.train()
-            optimizer_mi.zero_grad()
-            with torch.no_grad():
-                embeddings = model.get_batch_embeddings(train_indices)
-            estimator_loss = estimator.train_estimator(embeddings)
-            estimator_loss.backward()
-            optimizer_mi.step()
+            if estimator is not None:
+                estimator.train()
+                optimizer_mi.zero_grad()
+                with torch.no_grad():
+                    embeddings = model.get_batch_embeddings(train_indices)
+                estimator_loss = estimator.train_estimator(embeddings)
+                estimator_loss.backward()
+                optimizer_mi.step()
+            else:
+                estimator_loss = torch.zeros((), device=train_indices.device)
             epoch_loss.append(loss.data.item())
             epoch_mi_loss.append(estimator_loss.item())
         training_range.set_postfix(loss="main: {:.5} mi: {:.5}".format(sum(epoch_loss), sum(epoch_mi_loss)))
