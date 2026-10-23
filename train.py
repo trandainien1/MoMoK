@@ -1,11 +1,13 @@
 import argparse
 import time
+from pathlib import Path
 
 import numpy as np
 import torch
 from tqdm import tqdm
 
 from ablations.runtime_contract import estimator_should_run
+from ablations.torch_checkpoint import build_payload, checkpoint_config, restore_checkpoint, save_checkpoint
 from ablations.variants import resolve_variant
 from models.RelMoE import RelMoE
 from models.model import *
@@ -61,6 +63,8 @@ def parse_args():
         'run_mode': 'full',
         'metric_policy': 'legacy',
         'wandb_mode': 'disabled'
+        , 'checkpoint_dir': ''
+        , 'wandb_run_id': ''
     }
 
     parser = argparse.ArgumentParser()
@@ -124,13 +128,33 @@ def train_decoder(args):
     counter = 0
     best_val_metrics = model.init_metric_dict()
     best_test_metrics = model.init_metric_dict()
+    start_epoch = 0
+    if args.resume_checkpoint:
+        payload = restore_checkpoint(
+            args.resume_checkpoint,
+            args=args,
+            model=model,
+            estimator=estimator,
+            optimizer=optimizer,
+            optimizer_mi=optimizer_mi,
+            lr_scheduler=lr_scheduler,
+            corpus=corpus,
+        )
+        best_test_metrics = payload["best_validation_metrics"]
+        start_epoch = int(payload["completed_epoch"])
+        print(f"RESUME_OK={args.resume_checkpoint}")
+        print(f"RESUME_FROM_COMPLETED_EPOCH={start_epoch}")
+        print(f"NEXT_EPOCH={start_epoch + 1}")
+    checkpoint_dir = args.checkpoint_dir or args.output_dir
+    final_epoch_metrics = None
     corpus.batch_size = args.batch_size
     corpus.neg_num = args.neg_num
-    training_range = tqdm(range(args.epochs))
+    training_range = tqdm(range(start_epoch, args.epochs))
     for epoch in training_range:
         model.train()
         epoch_loss = []
         epoch_mi_loss = []
+        final_epoch_metrics = None
         t = time.time()
         corpus.shuffle()
         batch_limit = corpus.max_batch_num
@@ -173,7 +197,8 @@ def train_decoder(args):
                 epoch + 1, sum(epoch_loss) / len(epoch_loss), time.time() - t))
             model.eval()
             with torch.no_grad():
-                val_metrics = corpus.get_validation_pred(model, 'test')
+                val_metrics, _ = corpus.get_validation_pred(model, 'test')
+            final_epoch_metrics = dict(val_metrics)
             if val_metrics['MRR'] > best_test_metrics['MRR']:
                 best_test_metrics['MRR'] = val_metrics['MRR']
             if val_metrics['MR'] < best_test_metrics['MR']:
@@ -189,18 +214,55 @@ def train_decoder(args):
             print('\n'.join(['Epoch: {:04d}'.format(epoch + 1), model.format_metrics(val_metrics, 'test')]))
             print("\n\n")
 
+        completed_epoch = epoch + 1
+        if checkpoint_dir and (
+            completed_epoch % args.checkpoint_every == 0
+            or final_epoch_metrics is not None
+            or completed_epoch == args.epochs
+        ):
+            payload = build_payload(
+                args,
+                model,
+                estimator,
+                optimizer,
+                optimizer_mi,
+                lr_scheduler,
+                best_test_metrics,
+                corpus,
+                completed_epoch,
+                final_epoch_metrics,
+            )
+            digest = save_checkpoint(Path(checkpoint_dir) / "checkpoint_latest.pt", payload)
+            print(f"CHECKPOINT_SAVED=checkpoint_latest.pt COMPLETED_EPOCH={completed_epoch} SHA256={digest}")
+
 
     print('Total time elapsed: {:.4f}s'.format(time.time() - t_total))
     if not best_test_metrics:
         model.eval()
-        estimator.eval()
+        if estimator is not None:
+            estimator.eval()
         with torch.no_grad():
-            best_test_metrics = corpus.get_validation_pred(model, 'test')
+            best_test_metrics, _ = corpus.get_validation_pred(model, 'test')
     print('\n'.join(['Val set results:', model.format_metrics(best_val_metrics, 'val')]))
     print('\n'.join(['Test set results:', model.format_metrics(best_test_metrics, 'test')]))
     print("\n\n\n\n\n\n")
 
     if args.save:
+        if checkpoint_dir:
+            payload = build_payload(
+                args,
+                model,
+                estimator,
+                optimizer,
+                optimizer_mi,
+                lr_scheduler,
+                best_test_metrics,
+                corpus,
+                args.epochs,
+                final_epoch_metrics,
+            )
+            digest = save_checkpoint(Path(checkpoint_dir) / "checkpoint_final.pt", payload)
+            print(f"CHECKPOINT_FINAL_SHA256={digest}")
         torch.save(model.state_dict(), f'./checkpoint/{args.dataset}/{args.model}.pth')
         print('Saved model!')
 
