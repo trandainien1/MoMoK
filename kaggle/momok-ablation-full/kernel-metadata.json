@@ -1,0 +1,12 @@
+{
+  "id": "nientrandai/momok-ablation-mkg-w-no-gating-noise-full",
+  "title": "MoMoK MKG-W No Gating Noise Full",
+  "code_file": "momok_ablation_full.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": []
+}
