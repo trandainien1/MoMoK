@@ -28,6 +28,7 @@ class TorchCheckpointWiringTests(unittest.TestCase):
         self.assertIn("save_checkpoint", source)
         self.assertIn("restore_checkpoint", source)
         self.assertIn("checkpoint_dir", source)
+        self.assertIn("checkpoint_every", source)
         self.assertIn("completed_epoch", source)
 
 

@@ -64,6 +64,7 @@ def parse_args():
         'metric_policy': 'legacy',
         'wandb_mode': 'disabled'
         , 'checkpoint_dir': ''
+        , 'checkpoint_every': 25
         , 'wandb_run_id': ''
     }
 
