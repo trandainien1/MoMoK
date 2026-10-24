@@ -264,6 +264,7 @@ def train_decoder(args):
             )
             digest = save_checkpoint(Path(checkpoint_dir) / "checkpoint_final.pt", payload)
             print(f"CHECKPOINT_FINAL_SHA256={digest}")
+        Path(f'./checkpoint/{args.dataset}').mkdir(parents=True, exist_ok=True)
         torch.save(model.state_dict(), f'./checkpoint/{args.dataset}/{args.model}.pth')
         print('Saved model!')
 
