@@ -47,6 +47,45 @@ class CheckpointAdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_payload(payload, expected_config={"dataset": "MKG-W"}, use_exid=True)
 
+    def test_validate_payload_allows_only_epoch_target_extension(self):
+        payload = {
+            "format_version": 1,
+            "completed_epoch": 2,
+            "model_state_dict": {},
+            "optimizer_state_dict": {},
+            "lr_scheduler_state_dict": {},
+            "best_validation_metrics": {},
+            "python_random_state": None,
+            "numpy_rng_state": None,
+            "torch_rng_state": None,
+            "torch_cuda_rng_state_all": [],
+            "corpus_train_indices": [],
+            "config": {"dataset": "MKG-W", "epochs": 2},
+            "config_hash": "abc",
+            "variant_id": "full",
+            "dataset": "MKG-W",
+            "source_commit": "commit",
+            "estimator_state_dict": {},
+            "optimizer_mi_state_dict": {},
+        }
+        expected = {"dataset": "MKG-W", "epochs": 3}
+        self.assertIs(
+            validate_payload(
+                payload,
+                expected_config=expected,
+                use_exid=True,
+                allow_epoch_extension=True,
+            ),
+            payload,
+        )
+        with self.assertRaises(ValueError):
+            validate_payload(
+                payload,
+                expected_config={"dataset": "MKG-W", "epochs": 1},
+                use_exid=True,
+                allow_epoch_extension=True,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

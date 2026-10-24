@@ -36,18 +36,27 @@ def atomic_save(payload, path: Path, serializer: Callable | None = None) -> str:
     return digest
 
 
-def validate_payload(payload: dict, *, expected_config: dict, use_exid: bool) -> dict:
+def validate_payload(
+    payload: dict,
+    *,
+    expected_config: dict,
+    use_exid: bool,
+    allow_epoch_extension: bool = False,
+) -> dict:
     """Validate schema and exact expected configuration before resume."""
 
     missing = missing_required_keys(payload, use_exid=use_exid)
     if missing:
         raise ValueError(f"checkpoint missing required keys: {list(missing)}")
     saved_config = payload.get("config", {})
-    mismatches = {
-        key: (saved_config.get(key), value)
-        for key, value in expected_config.items()
-        if saved_config.get(key) != value
-    }
+    mismatches = {}
+    for key, value in expected_config.items():
+        saved = saved_config.get(key)
+        if allow_epoch_extension and key == "epochs" and saved is not None:
+            if saved <= value:
+                continue
+        if saved != value:
+            mismatches[key] = (saved, value)
     if mismatches:
         raise ValueError(f"checkpoint configuration mismatch: {mismatches}")
     return payload

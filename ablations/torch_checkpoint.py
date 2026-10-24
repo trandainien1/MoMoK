@@ -113,7 +113,12 @@ def restore_checkpoint(
 
     payload = torch.load(path, map_location="cpu", weights_only=False)
     config = checkpoint_config(args)
-    validate_payload(payload, expected_config=config, use_exid=estimator is not None)
+    validate_payload(
+        payload,
+        expected_config=config,
+        use_exid=estimator is not None,
+        allow_epoch_extension=True,
+    )
     if payload.get("source_commit", "") != os.environ.get("MOMOK_SOURCE_COMMIT", ""):
         raise ValueError("checkpoint source commit mismatch")
     model.load_state_dict(payload["model_state_dict"])

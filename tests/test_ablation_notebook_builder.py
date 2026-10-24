@@ -25,6 +25,8 @@ class AblationNotebookBuilderTests(unittest.TestCase):
             run_source = "".join(notebook["cells"][7]["source"])
             self.assertIn("TRAIN_LOG_BEGIN", run_source)
             self.assertIn("TRAIN_LOG_END", run_source)
+            self.assertIn("CHECKPOINT_ROUNDTRIP=PASS", run_source)
+            self.assertIn("RESUME_NEXT_EPOCH=3", run_source)
 
 
 if __name__ == "__main__":

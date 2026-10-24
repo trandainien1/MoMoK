@@ -19,7 +19,7 @@ def validate_notebook(path: Path) -> list[str]:
     if notebook.get("nbformat") != 4:
         errors.append("nbformat must be 4")
     source = "\n".join("".join(cell.get("source", [])) for cell in notebook.get("cells", []))
-    for marker in (SOURCE_COMMIT, "embeddings/{DATASET}/img_features.pth", "embeddings/{DATASET}/text_features.pth", "--variant", "--checkpoint_every", "checkpoint_latest.pt", "DATASET_VALIDATION=PASS"):
+    for marker in (SOURCE_COMMIT, "embeddings/{DATASET}/img_features.pth", "embeddings/{DATASET}/text_features.pth", "--variant", "--checkpoint_every", "checkpoint_latest.pt", "CHECKPOINT_ROUNDTRIP=PASS", "RESUME_NEXT_EPOCH=3", "DATASET_VALIDATION=PASS"):
         if marker not in source:
             errors.append("missing marker: " + marker)
     if "WANDB_API_KEY=" in source or "KAGGLE_API_TOKEN=" in source or "GH_TOKEN=" in source:
