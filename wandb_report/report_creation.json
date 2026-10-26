@@ -6,7 +6,10 @@
   "project": "graphml-momok-reproduction",
   "selected_run_ids": [
     "k2evocuw",
-    "tp1184w7"
+    "tp1184w7",
+    "mkgwngn1",
+    "mkgwnex1",
+    "mkgwnrt1"
   ],
   "selection_method": "empty_query_plus_run_settings_selection_root_0",
   "raw_id_filter_used": false,
@@ -26,13 +29,32 @@
     "eval/Hits@3",
     "eval/Hits@10"
   ],
+  "panels_mkgw_ablations": [
+    "eval/MRR",
+    "eval/Hits@1",
+    "eval/Hits@3",
+    "eval/Hits@10"
+  ],
+  "ablation_run_ids": [
+    "k2evocuw",
+    "mkgwngn1",
+    "mkgwnex1",
+    "mkgwnrt1"
+  ],
   "mkgw_tracking_mode": "retrospective_import_from_kaggle_logs",
   "mkgy_tracking_mode": "live_kaggle",
+  "ablation_tracking_mode": "retrospective_import_from_kaggle_logs",
+  "ablation_metric_policy": "legacy_best_per_metric",
+  "ablation_one_seed_only": true,
   "error_1054": "NOT_PRESENT_IN_SPEC",
+  "mkgw_history_modified": false,
+  "mkgy_training_loss_changed": false,
+  "temporary_ablation_render_test_url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/reports/MoMoK-MKG-W-Ablation-Render-Test--VmlldzoxODE4Njc0MA==",
+  "temporary_http_app_shell_status": 200,
+  "dynamic_visual_render_status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
   "public_reproduction_repository": "https://github.com/trandainien1/MoMoK",
   "stable_reproduction_tag": "course-momok-main-results-v1",
   "publication_branch": "course-reproduction",
   "publication_commit": "0be7453e42e34277eb023e2ee3d1e5d3dc7672cf",
-  "mkgw_runset_contexts": 1,
-  "mkgy_training_loss_changed": false
+  "mkgw_runset_contexts": 1
 }

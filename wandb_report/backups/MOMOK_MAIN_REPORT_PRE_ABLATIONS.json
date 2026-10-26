@@ -1,0 +1,779 @@
+{
+  "backup_timestamp_utc": "2026-10-26T22:28:30.329326+00:00",
+  "report_id": "VmlldzoxODA0ODgwMw==",
+  "title": "MoMoK — Main Result Reproduction",
+  "url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/reports/MoMoK-—-Main-Result-Reproduction--VmlldzoxODA0ODgwMw==",
+  "created_at": "2026-10-03T06:05:06+00:00",
+  "updated_at": "2026-10-04T09:23:06+00:00",
+  "visible_sections": [
+    "Reproduction Overview",
+    "Experimental Setup",
+    "MKG-W Main Result",
+    "MKG-Y Main Result",
+    "Cross-Dataset Comparison",
+    "Reproducibility & Provenance"
+  ],
+  "report_spec": {
+    "id": "VmlldzoxODA0ODgwMw==",
+    "name": "",
+    "displayName": "MoMoK — Main Result Reproduction",
+    "description": "Public main-result evidence for the completed MoMoK MKG-W and MKG-Y reproductions.",
+    "project": {
+      "name": "graphml-momok-reproduction",
+      "entityName": "trandainien1"
+    },
+    "createdAt": "2026-10-03T06:05:06Z",
+    "updatedAt": "2026-10-04T09:23:06Z",
+    "spec": {
+      "version": 5,
+      "panelSettings": {},
+      "blocks": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "Reproduction Overview"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "**Paper:** *Multiple Heads Are Better Than One: Mixture of Modality Knowledge Experts for Entity Representation Learning*\n**Task:** Multimodal knowledge graph link prediction\n**Experiments:** MKG-W and MKG-Y main-result reproductions, both completed at 2,000 epochs.\n**Source:** [zjukg/MoMoK](https://github.com/zjukg/MoMoK) at `99c2df114d48c79708ea0608644b685183d81bd9`.\n\nBoth runs satisfy the group's **STRONG_MATCH** criterion: all reported\nabsolute metric deltas are below 0.01. This is our reproduction criterion,\nnot terminology proposed by the MoMoK paper.\n\nRuns: [MKG-W](https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/k2evocuw) · [MKG-Y](https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/tp1184w7)"
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "Experimental Setup"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "**Official implementation:** [zjukg/MoMoK](https://github.com/zjukg/MoMoK)\n\n**Public reproduction repository:** [https://github.com/trandainien1/MoMoK](https://github.com/trandainien1/MoMoK)\n\n**Pinned upstream commit:** [`99c2df114d48c79708ea0608644b685183d81bd9`](https://github.com/zjukg/MoMoK/commit/99c2df114d48c79708ea0608644b685183d81bd9)\n\n**Stable reproduction tag:** [https://github.com/trandainien1/MoMoK/tree/course-momok-main-results-v1](https://github.com/trandainien1/MoMoK/tree/course-momok-main-results-v1)\n\n| Setting | MKG-W | MKG-Y |\n|---|---:|---:|\n| Epochs | 2000 | 2000 |\n| Batch size | 1024 | 1024 |\n| Seed | 10010 | 10010 |\n| Experts | 3 | 3 |\n| Evaluation | every 100 epochs | every 100 epochs |\n| Learning rate | 0.001 | 0.0005 |\n| μ | 0.0001 | 0.0001 |\n| Embedding dimension | 200 | 300 |\n| Entities | 15000 | 15000 |\n| Relations | 169 | 28 |\n| Train triples | 34196 | 21310 |\n| Valid triples | 4276 | 2665 |\n| Test triples | 4274 | 2663 |\n| Execution | Kaggle GPU | Kaggle / Tesla T4 |"
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "MKG-W Main Result"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "Tracking mode: `retrospective_import_from_kaggle_logs`. The Kaggle execution completed first; W&B history was imported later from real logs. No live-tracking claim is made."
+        },
+        {
+          "type": "panel-grid",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "metadata": {
+            "openViz": true,
+            "openRunSet": 0,
+            "name": "unused-name",
+            "runSets": [
+              {
+                "id": "d47t769ksr4",
+                "runFeed": {
+                  "version": 2,
+                  "columnVisible": {},
+                  "columnPinned": {},
+                  "columnWidths": {},
+                  "columnOrder": [],
+                  "pageSize": 10,
+                  "onlyShowSelected": false
+                },
+                "enabled": true,
+                "project": {
+                  "name": "graphml-momok-reproduction",
+                  "entityName": "trandainien1",
+                  "id": "UHJvamVjdEludGVybmFsSWQ6NDUyMjI1ODM="
+                },
+                "name": "MKG-W — exact run k2evocuw",
+                "search": {
+                  "query": ""
+                },
+                "filters": {
+                  "filterFormat": "filterV2",
+                  "filters": []
+                },
+                "grouping": [],
+                "sort": {
+                  "keys": [
+                    {
+                      "key": {
+                        "section": "run",
+                        "name": "createdAt"
+                      },
+                      "ascending": false
+                    }
+                  ]
+                },
+                "selections": {
+                  "root": 0,
+                  "bounds": [],
+                  "tree": [
+                    "k2evocuw"
+                  ]
+                },
+                "expandedRowAddresses": []
+              }
+            ],
+            "hideRunSets": false,
+            "panels": {
+              "views": {
+                "0": {
+                  "name": "Panels",
+                  "defaults": [],
+                  "config": []
+                }
+              },
+              "tabs": [
+                "0"
+              ]
+            },
+            "panelBankConfig": {
+              "state": 0,
+              "settings": {
+                "autoOrganizePrefix": 2,
+                "showEmptySections": false,
+                "sortAlphabetically": false
+              },
+              "sections": [
+                {
+                  "name": "Hidden Panels",
+                  "isOpen": false,
+                  "type": "flow",
+                  "flowConfig": {
+                    "snapToColumns": true,
+                    "columnsPerPage": 3,
+                    "rowsPerPage": 2,
+                    "gutterWidth": 16,
+                    "boxWidth": 460,
+                    "boxHeight": 300
+                  },
+                  "sorted": 0,
+                  "localPanelSettings": {
+                    "smoothingWeight": 0,
+                    "smoothingType": "exponential",
+                    "xAxis": "_step",
+                    "ignoreOutliers": false,
+                    "useRunsTableGroupingInPanels": true,
+                    "smoothingActive": true,
+                    "xAxisActive": false
+                  },
+                  "panels": []
+                }
+              ]
+            },
+            "panelBankSectionConfig": {
+              "name": "Report Panels",
+              "isOpen": false,
+              "panels": [
+                {
+                  "__id__": "1fpquiw6t3n",
+                  "layout": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W training loss",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "train/loss"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "119i7f1zsmz",
+                  "layout": {
+                    "x": 8,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W MI estimator loss",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "train/mi_estimator_loss"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "20dariih0hd",
+                  "layout": {
+                    "x": 16,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W MRR",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/MRR"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "aqm19tno5uo",
+                  "layout": {
+                    "x": 0,
+                    "y": 6,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W Hits@1",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@1"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "1in9700oyfq",
+                  "layout": {
+                    "x": 8,
+                    "y": 6,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W Hits@3",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@3"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "tm3bye1bum",
+                  "layout": {
+                    "x": 16,
+                    "y": 6,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-W Hits@10",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@10"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                }
+              ],
+              "type": "grid",
+              "flowConfig": {
+                "snapToColumns": true,
+                "columnsPerPage": 3,
+                "rowsPerPage": 2,
+                "gutterWidth": 16,
+                "boxWidth": 460,
+                "boxHeight": 300
+              },
+              "sorted": 0,
+              "localPanelSettings": {
+                "smoothingWeight": 0,
+                "smoothingType": "exponential",
+                "xAxis": "_step",
+                "ignoreOutliers": false,
+                "useRunsTableGroupingInPanels": true,
+                "smoothingActive": true,
+                "xAxisActive": false
+              }
+            },
+            "customRunColors": {}
+          }
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "| Metric | Paper | Reproduced | Absolute Delta |\n|---|---:|---:|---:|\n| MRR | 0.358900 | 0.351449 | 0.007451 |\n| Hits@1 | 0.303800 | 0.297964 | 0.005836 |\n| Hits@3 | 0.375400 | 0.371198 | 0.004202 |\n| Hits@10 | 0.461300 | 0.453205 | 0.008095 |\n\nVerdict: **STRONG_MATCH**."
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "MKG-Y Main Result"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "Tracking mode: `live_kaggle`. The run contains 2,000 unique training epochs\nand 20 evaluation events. The recorded history has no `train/mi_estimator_loss`\nfield, so no MI-loss panel is fabricated or reconstructed."
+        },
+        {
+          "type": "panel-grid",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "metadata": {
+            "openViz": true,
+            "openRunSet": 0,
+            "name": "unused-name",
+            "runSets": [
+              {
+                "id": "a7d1bez2514",
+                "runFeed": {
+                  "version": 2,
+                  "columnVisible": {},
+                  "columnPinned": {},
+                  "columnWidths": {},
+                  "columnOrder": [],
+                  "pageSize": 10,
+                  "onlyShowSelected": false
+                },
+                "enabled": true,
+                "project": {
+                  "name": "graphml-momok-reproduction",
+                  "entityName": "trandainien1",
+                  "id": "UHJvamVjdEludGVybmFsSWQ6NDUyMjI1ODM="
+                },
+                "name": "MKG-Y — exact run tp1184w7",
+                "search": {
+                  "query": ""
+                },
+                "filters": {
+                  "filterFormat": "filterV2",
+                  "filters": []
+                },
+                "grouping": [],
+                "sort": {
+                  "keys": [
+                    {
+                      "key": {
+                        "section": "run",
+                        "name": "createdAt"
+                      },
+                      "ascending": false
+                    }
+                  ]
+                },
+                "selections": {
+                  "root": 0,
+                  "bounds": [],
+                  "tree": [
+                    "tp1184w7"
+                  ]
+                },
+                "expandedRowAddresses": []
+              }
+            ],
+            "hideRunSets": false,
+            "panels": {
+              "views": {
+                "0": {
+                  "name": "Panels",
+                  "defaults": [],
+                  "config": []
+                }
+              },
+              "tabs": [
+                "0"
+              ]
+            },
+            "panelBankConfig": {
+              "state": 0,
+              "settings": {
+                "autoOrganizePrefix": 2,
+                "showEmptySections": false,
+                "sortAlphabetically": false
+              },
+              "sections": [
+                {
+                  "name": "Hidden Panels",
+                  "isOpen": false,
+                  "type": "flow",
+                  "flowConfig": {
+                    "snapToColumns": true,
+                    "columnsPerPage": 3,
+                    "rowsPerPage": 2,
+                    "gutterWidth": 16,
+                    "boxWidth": 460,
+                    "boxHeight": 300
+                  },
+                  "sorted": 0,
+                  "localPanelSettings": {
+                    "smoothingWeight": 0,
+                    "smoothingType": "exponential",
+                    "xAxis": "_step",
+                    "ignoreOutliers": false,
+                    "useRunsTableGroupingInPanels": true,
+                    "smoothingActive": true,
+                    "xAxisActive": false
+                  },
+                  "panels": []
+                }
+              ]
+            },
+            "panelBankSectionConfig": {
+              "name": "Report Panels",
+              "isOpen": false,
+              "panels": [
+                {
+                  "__id__": "i856qscvyz",
+                  "layout": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-Y training loss",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "train/loss"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                }
+              ],
+              "type": "grid",
+              "flowConfig": {
+                "snapToColumns": true,
+                "columnsPerPage": 3,
+                "rowsPerPage": 2,
+                "gutterWidth": 16,
+                "boxWidth": 460,
+                "boxHeight": 300
+              },
+              "sorted": 0,
+              "localPanelSettings": {
+                "smoothingWeight": 0,
+                "smoothingType": "exponential",
+                "xAxis": "_step",
+                "ignoreOutliers": false,
+                "useRunsTableGroupingInPanels": true,
+                "smoothingActive": true,
+                "xAxisActive": false
+              }
+            },
+            "customRunColors": {}
+          }
+        },
+        {
+          "type": "panel-grid",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "metadata": {
+            "openViz": true,
+            "openRunSet": 0,
+            "name": "unused-name",
+            "runSets": [
+              {
+                "id": "a7d1bez2514",
+                "runFeed": {
+                  "version": 2,
+                  "columnVisible": {},
+                  "columnPinned": {},
+                  "columnWidths": {},
+                  "columnOrder": [],
+                  "pageSize": 10,
+                  "onlyShowSelected": false
+                },
+                "enabled": true,
+                "project": {
+                  "name": "graphml-momok-reproduction",
+                  "entityName": "trandainien1",
+                  "id": "UHJvamVjdEludGVybmFsSWQ6NDUyMjI1ODM="
+                },
+                "name": "MKG-Y — exact run tp1184w7",
+                "search": {
+                  "query": ""
+                },
+                "filters": {
+                  "filterFormat": "filterV2",
+                  "filters": []
+                },
+                "grouping": [],
+                "sort": {
+                  "keys": [
+                    {
+                      "key": {
+                        "section": "run",
+                        "name": "createdAt"
+                      },
+                      "ascending": false
+                    }
+                  ]
+                },
+                "selections": {
+                  "root": 0,
+                  "bounds": [],
+                  "tree": [
+                    "tp1184w7"
+                  ]
+                },
+                "expandedRowAddresses": []
+              }
+            ],
+            "hideRunSets": false,
+            "panels": {
+              "views": {
+                "0": {
+                  "name": "Panels",
+                  "defaults": [],
+                  "config": []
+                }
+              },
+              "tabs": [
+                "0"
+              ]
+            },
+            "panelBankConfig": {
+              "state": 0,
+              "settings": {
+                "autoOrganizePrefix": 2,
+                "showEmptySections": false,
+                "sortAlphabetically": false
+              },
+              "sections": [
+                {
+                  "name": "Hidden Panels",
+                  "isOpen": false,
+                  "type": "flow",
+                  "flowConfig": {
+                    "snapToColumns": true,
+                    "columnsPerPage": 3,
+                    "rowsPerPage": 2,
+                    "gutterWidth": 16,
+                    "boxWidth": 460,
+                    "boxHeight": 300
+                  },
+                  "sorted": 0,
+                  "localPanelSettings": {
+                    "smoothingWeight": 0,
+                    "smoothingType": "exponential",
+                    "xAxis": "_step",
+                    "ignoreOutliers": false,
+                    "useRunsTableGroupingInPanels": true,
+                    "smoothingActive": true,
+                    "xAxisActive": false
+                  },
+                  "panels": []
+                }
+              ]
+            },
+            "panelBankSectionConfig": {
+              "name": "Report Panels",
+              "isOpen": false,
+              "panels": [
+                {
+                  "__id__": "anlgwui6aio",
+                  "layout": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-Y MRR",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/MRR"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "6dni09yl2vc",
+                  "layout": {
+                    "x": 8,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-Y Hits@1",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@1"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "2bitdmzfets",
+                  "layout": {
+                    "x": 16,
+                    "y": 0,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-Y Hits@3",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@3"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                },
+                {
+                  "__id__": "2wg9blbybgg",
+                  "layout": {
+                    "x": 0,
+                    "y": 6,
+                    "w": 8,
+                    "h": 6
+                  },
+                  "viewType": "Run History Line Plot",
+                  "config": {
+                    "chartTitle": "MKG-Y Hits@10",
+                    "xAxis": "epoch",
+                    "metrics": [
+                      "eval/Hits@10"
+                    ],
+                    "xAxisTitle": "Epoch"
+                  }
+                }
+              ],
+              "type": "grid",
+              "flowConfig": {
+                "snapToColumns": true,
+                "columnsPerPage": 3,
+                "rowsPerPage": 2,
+                "gutterWidth": 16,
+                "boxWidth": 460,
+                "boxHeight": 300
+              },
+              "sorted": 0,
+              "localPanelSettings": {
+                "smoothingWeight": 0,
+                "smoothingType": "exponential",
+                "xAxis": "_step",
+                "ignoreOutliers": false,
+                "useRunsTableGroupingInPanels": true,
+                "smoothingActive": true,
+                "xAxisActive": false
+              }
+            },
+            "customRunColors": {}
+          }
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "| Metric | Paper | Reproduced | Absolute Delta |\n|---|---:|---:|---:|\n| MRR | 0.379100 | 0.377988 | 0.001112 |\n| Hits@1 | 0.350900 | 0.349606 | 0.001294 |\n| Hits@3 | 0.392000 | 0.392978 | 0.000978 |\n| Hits@10 | 0.432000 | 0.427338 | 0.004662 |\n\nVerdict: **STRONG_MATCH**. The run used a Tesla T4 for approximately 6h41m.\nThe completed epoch-2000 checkpoint hash is\n`db2e47779049d569dda58810b9f8b3aa5e0f4da52b2a9c02677ba399510e7785` and the\nevidence artifact is `momok-mkg-y-kaggle-evidence:v0`. The Kaggle process\nreturned an error only after training, while constructing a W&B environment\ntable with mixed string/numeric values; this was repaired without retraining."
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "Cross-Dataset Comparison"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "| Dataset / Metric | Paper | Reproduced | Absolute Delta |\n|---|---:|---:|---:|\n| MKG-W MRR | 0.3589000000 | 0.3514488296 | 0.0074511704 |\n| MKG-W H@1 | 0.3038000000 | 0.2979644361 | 0.0058355639 |\n| MKG-W H@3 | 0.3754000000 | 0.3711979410 | 0.0042020590 |\n| MKG-W H@10 | 0.4613000000 | 0.4532054282 | 0.0080945718 |\n| MKG-Y MRR | 0.3791000000 | 0.3779882618 | 0.0011117382 |\n| MKG-Y H@1 | 0.3509000000 | 0.3496057078 | 0.0012942922 |\n| MKG-Y H@3 | 0.3920000000 | 0.3929778445 | 0.0009778445 |\n| MKG-Y H@10 | 0.4320000000 | 0.4273375892 | 0.0046624108 |\n\nMaximum absolute delta: MKG-W `0.0080945718`; MKG-Y `0.004662`. Both are\n`STRONG_MATCH`. These deltas are a reproducibility comparison, not a claim\nthat one dataset/model run is statistically better than the other."
+        },
+        {
+          "type": "heading",
+          "children": [
+            {
+              "text": "Reproducibility & Provenance"
+            }
+          ],
+          "level": 1
+        },
+        {
+          "type": "markdown-block",
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "content": "### 6.1 Source identity\n\nOfficial repository: [zjukg/MoMoK](https://github.com/zjukg/MoMoK); pinned commit `99c2df114d48c79708ea0608644b685183d81bd9`.\n\n### 6.2 Dataset identity\n\nMKG-W was validated as 15,000 entities, 169 relations, and 34,196/4,276/4,274\ntrain/validation/test triples, with image availability 14,463 × 383 and text\navailability 14,123 × 384. MKG-Y was validated as 15,000 entities, 28\nrelations, and 21,310/2,665/2,663 triples, with feature tensors `[15000, 383]`\nand `[15000, 384]`.\n\n### 6.3 Kaggle execution\n\nBoth experiments ran on Kaggle GPUs for 2,000 epochs. MKG-Y used a Tesla T4\nand ran for approximately 6h41m.\n\n### 6.4 W&B tracking provenance\n\nMKG-W uses `retrospective_import_from_kaggle_logs`; MKG-Y uses `live_kaggle`.\nThese modes are intentionally distinguished.\n\n### 6.5 Checkpoint strategy\n\nThe hardened workflow supports periodic full-state checkpoints containing model,\nMI estimator, both optimizers, scheduler, RNG, corpus ordering, and provenance\nmetadata. MKG-Y's final checkpoint is epoch 2000 with SHA256\n`db2e47779049d569dda58810b9f8b3aa5e0f4da52b2a9c02677ba399510e7785`. The\nbinary is not uploaded to the W&B artifact; only its hash and provenance are.\n\n### 6.6 Reproduction procedure\n\n**Public reproduction repository:** [https://github.com/trandainien1/MoMoK](https://github.com/trandainien1/MoMoK)\n\n```bash\ngit clone https://github.com/trandainien1/MoMoK.git\ncd MoMoK\ngit checkout course-momok-main-results-v1\n```\n\nThen configure the local Python/Kaggle environment, create the ignored\nKaggle credential file, and source `scripts/kaggle_env.sh`. Build and validate\nthe selected notebook with:\n\n```bash\npython scripts/build_kaggle_notebook.py\npython scripts/validate_notebook.py\n```\n\nFor MKG-W, the maintained launcher is `bash scripts/kaggle_push_run.sh`. For\nMKG-Y, use `python scripts/build_mkgy_notebook.py`,\n`python scripts/validate_mkgy_notebook.py`, and\n`bash scripts/kaggle_mkgy_push.sh`. After uploading the MKG-Y notebook,\nattach `WANDB_API_KEY` through Kaggle Add-ons → Secrets, enable notebook\naccess, and select Save & Run All. This manual gate is required for live W&B\ntracking and is not replaced by a credential in the repository.\n\nMonitor with `bash scripts/kaggle_monitor_mkgy.sh` and download outputs with\n`bash scripts/kaggle_download_outputs.sh owner/kernel`. The workflow validates\nthe pinned source and dataset before smoke testing, trains the configured\nfull-model run, writes full-state checkpoints, evaluates the final epoch, and\nexports safe evidence. Credentials remain local-only; no raw credential or\naccess-token URL is part of this report."
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "width": "readable",
+      "authors": [],
+      "discussionThreads": []
+    }
+  }
+}
