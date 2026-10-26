@@ -5,11 +5,17 @@ from ablations.wandb_publication import (
     BASELINE_METRICS,
     BASELINE_RUN_ID,
     PUBLICATION_VARIANTS,
+    SAFE_OUTPUT_FILES,
     VariantPublicationError,
     comparison_rows,
     publication_for,
+    safe_output_files,
     validate_dataset_manifest,
+    validate_safe_output_dir,
 )
+import json
+import tempfile
+from pathlib import Path
 
 
 class PublicationRegistryTests(unittest.TestCase):
@@ -86,6 +92,27 @@ class PublicationRegistryTests(unittest.TestCase):
         variant_ids = {row[0] for row in rows if row[0] != "Full Model (Proposed Method)"}
         self.assertEqual(variant_ids, set(PUBLICATION_VARIANTS))
         self.assertTrue(all(len(row) == 8 for row in rows))
+
+    def test_download_allowlist_is_exact_and_checkpoint_binary_is_not_allowed(self):
+        self.assertEqual(
+            SAFE_OUTPUT_FILES,
+            ("ablation_smoke.log", "dataset_manifest.json", "output_inventory.json", "checkpoint_final.pt.sha256"),
+        )
+        self.assertEqual(safe_output_files(), SAFE_OUTPUT_FILES)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "ablation_smoke.log").write_text("completed\n")
+            (root / "dataset_manifest.json").write_text(json.dumps({
+                "entities": 15000, "relations": 169, "train": 34196, "valid": 4276,
+                "test": 4274, "image_shape": [15000, 383], "text_shape": [15000, 384],
+            }))
+            (root / "output_inventory.json").write_text(json.dumps(["checkpoints/checkpoint_final.pt"]))
+            item = publication_for("no_gating_noise")
+            (root / "checkpoint_final.pt.sha256").write_text(item.checkpoint_sha256 + "  checkpoint_final.pt\n")
+            validate_safe_output_dir(root, item)
+            (root / "checkpoint_final.pt").write_bytes(b"must never be downloaded")
+            with self.assertRaises(VariantPublicationError):
+                validate_safe_output_dir(root, item)
 
 
 if __name__ == "__main__":

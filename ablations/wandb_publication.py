@@ -33,6 +33,12 @@ DATASET_FINGERPRINT = {
     "image_shape": (15000, 383),
     "text_shape": (15000, 384),
 }
+SAFE_OUTPUT_FILES = (
+    "ablation_smoke.log",
+    "dataset_manifest.json",
+    "output_inventory.json",
+    "checkpoint_final.pt.sha256",
+)
 
 
 class VariantPublicationError(ValueError):
@@ -155,6 +161,43 @@ def validate_dataset_manifest(manifest: dict, item: AblationPublication) -> None
             raise VariantPublicationError(
                 f"{item.variant_id}: dataset manifest {key}={actual!r}, expected {expected!r}"
             )
+
+
+def safe_output_files() -> tuple[str, ...]:
+    """Return the exact allowlist for Kaggle output recovery."""
+
+    return SAFE_OUTPUT_FILES
+
+
+def validate_safe_output_dir(output_dir, item: AblationPublication) -> None:
+    """Validate a flattened allowlisted download without opening checkpoints."""
+
+    from pathlib import Path
+    import json
+
+    root = Path(output_dir)
+    actual_names = {path.name for path in root.iterdir() if path.is_file()}
+    expected_names = set(SAFE_OUTPUT_FILES)
+    if actual_names != expected_names:
+        raise VariantPublicationError(
+            f"{item.variant_id}: recovered files {sorted(actual_names)!r}, "
+            f"expected exactly {sorted(expected_names)!r}"
+        )
+    if (root / "checkpoint_final.pt").exists():
+        raise VariantPublicationError("checkpoint binaries are not part of the safe download")
+    manifest = json.loads((root / "dataset_manifest.json").read_text(encoding="utf-8"))
+    validate_dataset_manifest(manifest, item)
+    inventory = json.loads((root / "output_inventory.json").read_text(encoding="utf-8"))
+    if not isinstance(inventory, list) or "checkpoints/checkpoint_final.pt" not in inventory:
+        raise VariantPublicationError("output inventory does not identify checkpoint_final.pt")
+    sidecar = (root / "checkpoint_final.pt.sha256").read_text(encoding="utf-8").strip()
+    digest = sidecar.split()[0] if sidecar else ""
+    if digest != item.checkpoint_sha256:
+        raise VariantPublicationError(
+            f"{item.variant_id}: checkpoint sidecar SHA256 does not match publication record"
+        )
+    if not (root / "ablation_smoke.log").stat().st_size:
+        raise VariantPublicationError("ablation training log is empty")
 
 
 def comparison_rows(items: Sequence[AblationPublication]) -> list[list[object]]:
