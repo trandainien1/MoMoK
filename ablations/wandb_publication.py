@@ -224,3 +224,130 @@ def comparison_rows(items: Sequence[AblationPublication]) -> list[list[object]]:
                 ]
             )
     return rows
+
+
+HISTORY_FIELD_MAP = (
+    ("train_main_loss", "train/loss"),
+    ("mi_estimator_loss", "train/mi_estimator_loss"),
+    ("learning_rate", "train/lr"),
+    ("eval_MRR", "eval/MRR"),
+    ("eval_Hits@1", "eval/Hits@1"),
+    ("eval_Hits@3", "eval/Hits@3"),
+    ("eval_Hits@10", "eval/Hits@10"),
+    ("eval_MR", "eval/MR"),
+    ("epoch_time_sec", "runtime/epoch_time_sec"),
+)
+
+
+def build_history_records(rows: Sequence[dict[str, object]]) -> list[dict[str, object]]:
+    """Map only nonempty source columns to W&B metrics, with true epoch steps."""
+
+    result: list[dict[str, object]] = []
+    previous_epoch = 0
+    for row in rows:
+        try:
+            epoch = int(row["epoch"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise VariantPublicationError("history row has no integer epoch") from exc
+        if epoch <= previous_epoch:
+            raise VariantPublicationError("history epochs must be strictly increasing")
+        record: dict[str, object] = {"epoch": epoch}
+        for source, target in HISTORY_FIELD_MAP:
+            raw = row.get(source)
+            if raw in (None, ""):
+                continue
+            try:
+                value = float(raw)
+            except (TypeError, ValueError) as exc:
+                raise VariantPublicationError(f"history value {source} is not numeric") from exc
+            record[target] = value
+        result.append(record)
+        previous_epoch = epoch
+    return result
+
+
+def comparison_table_rows(item: AblationPublication) -> list[list[float | str]]:
+    rows: list[list[float | str]] = []
+    metrics = item.final_metrics
+    for metric, baseline in BASELINE_METRICS.items():
+        reproduced = metrics[metric]
+        signed = reproduced - baseline
+        rows.append([metric, baseline, reproduced, signed, abs(signed)])
+    return rows
+
+
+def build_environment_rows(item: AblationPublication, environment: dict[str, object]) -> list[tuple[str, str]]:
+    config = item.config
+    rows: list[tuple[str, str]] = [
+        ("Dataset", item.dataset),
+        ("Entities", str(DATASET_FINGERPRINT["entities"])),
+        ("Relations", str(DATASET_FINGERPRINT["relations"])),
+        ("Train triples", str(DATASET_FINGERPRINT["train"])),
+        ("Validation triples", str(DATASET_FINGERPRINT["valid"])),
+        ("Test triples", str(DATASET_FINGERPRINT["test"])),
+        ("Variant", item.variant_id),
+        ("Epochs", str(item.epochs)),
+        ("Seed", str(config["seed"])),
+        ("Batch size", str(config["batch_size"])),
+        ("Embedding dimension", str(config["dim"])),
+        ("Experts", str(config["n_exp"])),
+        ("Learning rate", str(config["lr"])),
+        ("Mu", str(config["mu"])),
+        ("GPU", str(environment.get("gpu", "not recorded"))),
+        ("Metric policy", item.metric_policy),
+        ("Kaggle kernel", f"nientrandai/{item.kernel_slug}"),
+        ("Kaggle version", str(item.kaggle_version)),
+        ("Source commit", item.source_commit),
+    ]
+    return rows
+
+
+def build_variant_summary(item: AblationPublication, checkpoint_sha256: str) -> dict[str, object]:
+    if checkpoint_sha256 != item.checkpoint_sha256:
+        raise VariantPublicationError("checkpoint SHA256 does not match the frozen record")
+    result: dict[str, object] = {
+        "dataset": item.dataset,
+        "variant": item.variant_id,
+        "variant_definition": item.operational_definition,
+        "operational_ablation": True,
+        "completed_epoch": item.epochs,
+        "source_commit": item.source_commit,
+        "kaggle_kernel": f"nientrandai/{item.kernel_slug}",
+        "kaggle_version": item.kaggle_version,
+        "tracking_mode": "retrospective_import_from_kaggle_logs",
+        "live_tracking": False,
+        "metric_policy": item.metric_policy,
+        "final_metric_source": "terminal_Test_set_results_independent_best_per_metric",
+        "checkpoint_sha256": checkpoint_sha256,
+        "checkpoint_uploaded": False,
+        "baseline_run_id": item.baseline_run_id,
+        "baseline_label": item.baseline_label,
+    }
+    for metric, reproduced in item.expected_final_metrics:
+        baseline = BASELINE_METRICS[metric]
+        signed = reproduced - baseline
+        result[f"reproduced/{metric}"] = reproduced
+        result[f"baseline/{metric}"] = baseline
+        result[f"delta_signed/{metric}"] = signed
+        result[f"delta_abs/{metric}"] = abs(signed)
+    return result
+
+
+def existing_run_action(existing_summary: dict, history_records: Sequence[dict], fingerprint: str) -> str:
+    """Fail closed on partial/incompatible runs; skip exact completed imports."""
+
+    if not existing_summary and not history_records:
+        return "resume_empty"
+    if (
+        existing_summary.get("publication_complete") is True
+        and existing_summary.get("publication_fingerprint") == fingerprint
+    ):
+        return "skip_complete"
+    if history_records or any(
+        existing_summary.get(key)
+        for key in ("publication_tables_written", "publication_artifact_written")
+    ):
+        raise VariantPublicationError(
+            "deterministic W&B run is partially populated or has a different fingerprint; refusing duplicate publication"
+        )
+    return "resume_empty"

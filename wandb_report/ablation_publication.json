@@ -1,0 +1,127 @@
+{
+  "baseline": {
+    "label": "Full Model (Proposed Method)",
+    "metrics": {
+      "Hits@1": 0.2979644361,
+      "Hits@10": 0.4532054282,
+      "Hits@3": 0.371197941,
+      "MRR": 0.3514488296
+    },
+    "run_id": "k2evocuw"
+  },
+  "entity": "trandainien1",
+  "group": "ablations",
+  "job_type": "ablation",
+  "one_seed_only": true,
+  "paper_fidelity_note": "These are one-seed operational ablations. Exact Table 2 protocol equivalence is not claimed.",
+  "project": "graphml-momok-reproduction",
+  "publication_mode": "retrospective_import_from_kaggle_logs",
+  "shared_metric_policy": "legacy_best_per_metric",
+  "variants": [
+    {
+      "artifact_name": "momok-mkg-w-no-gating-noise-kaggle-v1-evidence:v0",
+      "baseline_absolute_delta": {
+        "Hits@1": 0.00033556390000000214,
+        "Hits@10": 0.0010945717999999993,
+        "Hits@3": 0.0016020590000000445,
+        "MRR": 0.001148829600000012
+      },
+      "baseline_signed_delta": {
+        "Hits@1": 0.00033556390000000214,
+        "Hits@10": 0.0010945717999999993,
+        "Hits@3": 0.0016020590000000445,
+        "MRR": -0.001148829600000012
+      },
+      "checkpoint_sha256": "58052dd66e83e61a58c1cc9bc5728dcb8285630280c23c77a89bed4e5caa3291",
+      "checkpoint_uploaded": false,
+      "completed_epoch": 2000,
+      "final_metrics": {
+        "Hits@1": 0.2983,
+        "Hits@10": 0.4543,
+        "Hits@3": 0.3728,
+        "MRR": 0.3503
+      },
+      "history_points": 20,
+      "kaggle_kernel": "nientrandai/momok-mkg-w-no-gating-noise-full",
+      "kaggle_version": 1,
+      "metric_policy": "legacy_best_per_metric",
+      "operational_ablation": true,
+      "operational_definition": "Gaussian gating noise disabled in the existing MoE gating path; other model settings retained.",
+      "run_id": "mkgwngn1",
+      "run_name": "momok-mkgw-no-gating-noise-kaggle-v1-seed10010",
+      "run_url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/mkgwngn1",
+      "tracking_mode": "retrospective_import_from_kaggle_logs",
+      "variant": "no_gating_noise"
+    },
+    {
+      "artifact_name": "momok-mkg-w-no-exid-kaggle-v1-evidence:v0",
+      "baseline_absolute_delta": {
+        "Hits@1": 0.0011644360999999992,
+        "Hits@10": 0.005394571800000025,
+        "Hits@3": 0.001202059000000033,
+        "MRR": 0.0005488296000000226
+      },
+      "baseline_signed_delta": {
+        "Hits@1": -0.0011644360999999992,
+        "Hits@10": 0.005394571800000025,
+        "Hits@3": 0.001202059000000033,
+        "MRR": -0.0005488296000000226
+      },
+      "checkpoint_sha256": "cf2d30c4883b1aec837da0aad6251ba5dd74b4aaf346d04307ad702cbaa81fc0",
+      "checkpoint_uploaded": false,
+      "completed_epoch": 2000,
+      "final_metrics": {
+        "Hits@1": 0.2968,
+        "Hits@10": 0.4586,
+        "Hits@3": 0.3724,
+        "MRR": 0.3509
+      },
+      "history_points": 20,
+      "kaggle_kernel": "nientrandai/momok-mkg-w-no-exid-full",
+      "kaggle_version": 1,
+      "metric_policy": "legacy_best_per_metric",
+      "operational_ablation": true,
+      "operational_definition": "CLUB/ExID estimator and its optimizer disabled; mu=0.0; other model settings retained.",
+      "run_id": "mkgwnex1",
+      "run_name": "momok-mkgw-no-exid-kaggle-v1-seed10010",
+      "run_url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/mkgwnex1",
+      "tracking_mode": "retrospective_import_from_kaggle_logs",
+      "variant": "no_exid"
+    },
+    {
+      "artifact_name": "momok-mkg-w-no-relation-temperature-kaggle-v1-evidence:v0",
+      "baseline_absolute_delta": {
+        "Hits@1": 0.007935563899999998,
+        "Hits@10": 0.009594571800000007,
+        "Hits@3": 0.004702059000000036,
+        "MRR": 0.007151170399999962
+      },
+      "baseline_signed_delta": {
+        "Hits@1": 0.007935563899999998,
+        "Hits@10": 0.009594571800000007,
+        "Hits@3": 0.004702059000000036,
+        "MRR": 0.007151170399999962
+      },
+      "checkpoint_sha256": "6aa771d6c985fec4ae97225a77c1f24ed40631b6e8e493c8f0607755833d6898",
+      "checkpoint_uploaded": false,
+      "completed_epoch": 2000,
+      "final_metrics": {
+        "Hits@1": 0.3059,
+        "Hits@10": 0.4628,
+        "Hits@3": 0.3759,
+        "MRR": 0.3586
+      },
+      "history_points": 20,
+      "kaggle_kernel": "nientrandai/momok-mkg-w-no-relation-temperature-full",
+      "kaggle_version": 1,
+      "metric_policy": "legacy_best_per_metric",
+      "operational_ablation": true,
+      "operational_definition": "Relation-conditioned temperature removed from expert gating; relation embeddings used by prediction heads remain active.",
+      "run_id": "mkgwnrt1",
+      "run_name": "momok-mkgw-no-relation-temperature-kaggle-v1-seed10010",
+      "run_url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/runs/mkgwnrt1",
+      "tracking_mode": "retrospective_import_from_kaggle_logs",
+      "variant": "no_relation_temperature"
+    }
+  ]
+}
