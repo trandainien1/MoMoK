@@ -27,6 +27,8 @@ PUBLIC_TAG = "https://github.com/trandainien1/MoMoK/tree/course-momok-main-resul
 COMMIT = "99c2df114d48c79708ea0608644b685183d81bd9"
 MKGW = "k2evocuw"
 MKGY = "tp1184w7"
+ABLATION_RUN_IDS = (MKGW, "mkgwngn1", "mkgwnex1", "mkgwnrt1")
+ABLATION_PUBLICATION = REPORT_DIR / "ablation_publication.json"
 
 
 def markdown(text: str) -> wr.MarkdownBlock:
@@ -36,12 +38,16 @@ def markdown(text: str) -> wr.MarkdownBlock:
 def runset(run_id: str, name: str) -> wr.Runset:
     # Supported report selection: empty query + disabled settings for all
     # non-target runs, with the visible selection tree rooted at zero.
+    return runset_many([run_id], name)
+
+
+def runset_many(run_ids: list[str] | tuple[str, ...], name: str) -> wr.Runset:
     selected = wr.Runset(
         entity=ENTITY,
         project=PROJECT,
         name=name,
         filters="",
-        run_settings={run_id: wr.RunSettings(disabled=False)},
+        run_settings={run_id: wr.RunSettings(disabled=False) for run_id in run_ids},
     )
     selected._selections_root = 0
     return selected
@@ -63,6 +69,77 @@ def comparison_table() -> str:
         "|---|---:|---:|---:|",
         *[f"| {m} | {p:.10f} | {r:.10f} | {d:.10f} |" for m, p, r, d in rows],
     ])
+
+
+def ablation_runset() -> wr.Runset:
+    return runset_many(ABLATION_RUN_IDS, "MKG-W Full Model baseline and three ablations")
+
+
+def _ablation_publication_data() -> dict:
+    return json.loads(ABLATION_PUBLICATION.read_text(encoding="utf-8"))
+
+
+def ablation_blocks() -> list:
+    data = _ablation_publication_data()
+    baseline = data["baseline"]
+    variants = data["variants"]
+    lines = [
+        "| Variant | Run | Metric | Full Model | Reproduced | Signed Delta | Absolute Delta |",
+        "|---|---|---|---:|---:|---:|---:|",
+    ]
+    for metric in ("MRR", "Hits@1", "Hits@3", "Hits@10"):
+        value = baseline["metrics"][metric]
+        lines.append(
+            f"| Full Model (Proposed Method) | [`{baseline['run_id']}`](https://wandb.ai/{ENTITY}/{PROJECT}/runs/{baseline['run_id']}) | {metric} | {value:.10f} | {value:.10f} | 0.0000000000 | 0.0000000000 |"
+        )
+    for variant in variants:
+        for metric in ("MRR", "Hits@1", "Hits@3", "Hits@10"):
+            reproduced = variant["final_metrics"][metric]
+            signed = variant["baseline_signed_delta"][metric]
+            absolute = variant["baseline_absolute_delta"][metric]
+            lines.append(
+                f"| `{variant['variant']}` | [`{variant['run_id']}`]({variant['run_url']}) | {metric} | {baseline['metrics'][metric]:.10f} | {reproduced:.10f} | {signed:+.10f} | {absolute:.10f} |"
+            )
+
+    provenance_lines = [
+        "**Operational variants (one seed, legacy best-per-metric policy):**",
+        "",
+        "| Variant | Definition | Kaggle kernel | Checkpoint SHA256 | Evidence Artifact |",
+        "|---|---|---|---|---|",
+    ]
+    for variant in variants:
+        provenance_lines.append(
+            f"| `{variant['variant']}` | {variant['operational_definition']} | [{variant['kaggle_kernel']}](https://www.kaggle.com/code/{variant['kaggle_kernel']}) | `{variant['checkpoint_sha256']}` | `{variant['artifact_name']}` |"
+        )
+    for variant in variants:
+        provenance_lines.append(
+            f"\nRun: [{variant['run_id']}]({variant['run_url']}); {variant['completed_epoch']}/2000 epochs; "
+            f"{variant['history_points']} observed history points; retrospective import."
+        )
+
+    panels = [
+        wr.LinePlot(title="MKG-W ablation MRR", x="epoch", y=["eval/MRR"], title_x="Epoch"),
+        wr.LinePlot(title="MKG-W ablation Hits@1", x="epoch", y=["eval/Hits@1"], title_x="Epoch"),
+        wr.LinePlot(title="MKG-W ablation Hits@3", x="epoch", y=["eval/Hits@3"], title_x="Epoch"),
+        wr.LinePlot(title="MKG-W ablation Hits@10", x="epoch", y=["eval/Hits@10"], title_x="Epoch"),
+    ]
+    return [
+        wr.H1("Ablation Studies — MKG-W"),
+        markdown("""
+These are retrospective imports from completed Kaggle runs. Curves show only
+the 20 observed evaluations at epochs 100–2000. Final table metrics come from
+the terminal legacy `Test set results` summary, which tracks best values
+independently by metric; they are distinct from the epoch-2000 evaluation row.
+
+The baseline row is the paper's **Full Model (Proposed Method)** run. These
+three results are one-seed operational ablations under
+`legacy_best_per_metric`. Exact equivalence to the paper's Table 2 protocol is
+not claimed.
+"""),
+        wr.PanelGrid(runsets=[ablation_runset()], panels=panels),
+        markdown("\n".join(lines)),
+        markdown("\n".join(provenance_lines)),
+    ]
 
 
 def blocks() -> list:
@@ -167,6 +244,7 @@ Maximum absolute delta: MKG-W `0.0080945718`; MKG-Y `0.004662`. Both are
 `STRONG_MATCH`. These deltas are a reproducibility comparison, not a claim
 that one dataset/model run is statistically better than the other.
 """),
+        *ablation_blocks(),
         wr.H1("Reproducibility & Provenance"),
         markdown(f"""
 ### 6.1 Source identity
@@ -246,6 +324,7 @@ def validate_run(run_id: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--minimal-test", action="store_true")
+    parser.add_argument("--minimal-ablation-test", action="store_true")
     parser.add_argument("--delete-temp-url", default="")
     args = parser.parse_args()
     if not os.environ.get("WANDB_API_KEY", "").strip():
@@ -266,6 +345,33 @@ def main() -> None:
             report.save(draft=False)
         print(report.url)
         return
+    if args.minimal_ablation_test:
+        for run_id in ABLATION_RUN_IDS:
+            validate_run(run_id)
+        report = wr.Report(
+            entity=ENTITY,
+            project=PROJECT,
+            title="MoMoK MKG-W Ablation Render Test",
+            description="Temporary diagnostic for the safe four-run selection.",
+            blocks=[
+                wr.H1("Ablation Render Test"),
+                markdown("Baseline and one completed ablation are selected with supported run settings."),
+                wr.PanelGrid(
+                    runsets=[runset(MKGW, "Full Model (Proposed Method)")],
+                    panels=[wr.LinePlot(title="Baseline MRR", x="epoch", y=["eval/MRR"], title_x="Epoch")],
+                ),
+                wr.PanelGrid(
+                    runsets=[runset("mkgwngn1", "No gating noise")],
+                    panels=[wr.LinePlot(title="Ablation MRR", x="epoch", y=["eval/MRR"], title_x="Epoch")],
+                ),
+                markdown("| Variant | Run | Metric |\n|---|---|---:|\n| Full Model | k2evocuw | MRR |\n| no_gating_noise | mkgwngn1 | MRR |"),
+            ],
+            width="fluid",
+        )
+        with contextlib.redirect_stdout(io.StringIO()):
+            report.save(draft=False)
+        print(report.url)
+        return
     metadata = json.loads(META.read_text())
     report = wr.Report.from_url(metadata["report_url"])
     report.title = TITLE
@@ -277,14 +383,31 @@ def main() -> None:
     PUBLIC_URL.write_text(report.url + "\n")
     META.write_text(json.dumps({
         "title": TITLE, "report_id": report.id, "report_url": report.url,
-        "entity": ENTITY, "project": PROJECT, "selected_run_ids": [MKGW, MKGY],
+        "entity": ENTITY, "project": PROJECT,
+        "selected_run_ids": [MKGW, MKGY, "mkgwngn1", "mkgwnex1", "mkgwnrt1"],
         "selection_method": "empty_query_plus_run_settings_selection_root_0",
         "raw_id_filter_used": False, "render_method": "PROGRAMMATIC_IN_PLACE_UPDATE",
         "panels_mkgw": ["train/loss", "train/mi_estimator_loss", "eval/MRR", "eval/Hits@1", "eval/Hits@3", "eval/Hits@10"],
         "panels_mkgy": ["train/loss", "eval/MRR", "eval/Hits@1", "eval/Hits@3", "eval/Hits@10"],
+        "panels_mkgw_ablations": ["eval/MRR", "eval/Hits@1", "eval/Hits@3", "eval/Hits@10"],
+        "ablation_run_ids": ["k2evocuw", "mkgwngn1", "mkgwnex1", "mkgwnrt1"],
         "mkgw_tracking_mode": "retrospective_import_from_kaggle_logs",
         "mkgy_tracking_mode": "live_kaggle",
+        "ablation_tracking_mode": "retrospective_import_from_kaggle_logs",
+        "ablation_metric_policy": "legacy_best_per_metric",
+        "ablation_one_seed_only": True,
         "error_1054": "NOT_PRESENT_IN_SPEC",
+        "mkgw_history_modified": False,
+        "mkgy_training_loss_changed": False,
+        "temporary_ablation_render_test_url": "https://wandb.ai/trandainien1/graphml-momok-reproduction/reports/MoMoK-MKG-W-Ablation-Render-Test--VmlldzoxODE4Njc0MA==",
+        "temporary_http_app_shell_status": 200,
+        "dynamic_visual_render_status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
+        "public_reproduction_repository": PUBLIC_REPO,
+        "stable_reproduction_tag": "course-momok-main-results-v1",
+        "publication_branch": "course-reproduction",
+        "publication_commit": "0be7453e42e34277eb023e2ee3d1e5d3dc7672cf",
+        "mkgw_runset_contexts": 1,
+        "mkgy_training_loss_changed": False,
     }, indent=2, ensure_ascii=False) + "\n")
     print(report.url)
 

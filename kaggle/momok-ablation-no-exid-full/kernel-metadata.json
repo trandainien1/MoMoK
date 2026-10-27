@@ -1,0 +1,12 @@
+{
+  "id": "nientrandai/momok-ablation-mkg-w-no-exid-full",
+  "title": "MoMoK MKG-W No ExID Full",
+  "code_file": "momok_ablation_no_exid_full.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": []
+}

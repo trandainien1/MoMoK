@@ -13,6 +13,8 @@ wandb/
 *.pth
 checkpoints/
 kaggle_outputs/
+wandb_export/ablations/
 *.log
 __pycache__/
 *.pyc
+.superpowers/

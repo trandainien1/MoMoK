@@ -1,0 +1,12 @@
+{
+  "id": "nientrandai/momok-ablation-mkg-w-full-regression-smoke",
+  "title": "MoMoK MKG-W Full Regression Smoke",
+  "code_file": "momok_ablation_full_regression.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": []
+}
