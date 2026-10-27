@@ -2,21 +2,32 @@
 
 ## Status
 
-This branch is an isolated implementation workspace for MoMoK ablation
-experiments. The completed MKG-W/MKG-Y Full Model artifacts are not modified.
+This branch adds a configurable ablation implementation and records three
+completed MKG-W operational ablations. The existing MKG-W and MKG-Y Full
+Model runs and their histories were not modified.
 
-Completed so far:
+Implemented infrastructure includes:
 
-- explicit variant configuration contract;
+- explicit variant configuration and training/evaluation contracts;
 - `K=1` handling that disables CLUB/ExID explicitly;
-- distinction between `mu_zero_proxy` and `no_exid`;
-- head/loss/inference policy contract;
-- deterministic configuration fingerprinting;
-- optional-estimator checkpoint schema metadata;
-- local pure-Python contract tests.
+- separate `mu_zero_proxy` and `no_exid` behavior;
+- variant-aware model heads, loss, inference, and checkpoints;
+- deterministic configuration fingerprints and isolated output paths;
+- atomic full-state checkpointing, resume support, and bundle checksums;
+- Kaggle smoke notebooks, full notebook generation, and validation;
+- observed-only log parsing and retrospective W&B publication helpers.
 
-The Kaggle notebook transplant, full-state runtime adapter, and Kaggle smoke
-test remain gated until they are implemented and verified.
+Completed MKG-W runs are `no_gating_noise`, `no_exid`, and
+`no_relation_temperature`, each at 2,000 epochs on one seed. Their results,
+baseline comparisons, Kaggle provenance, checkpoint hashes, and W&B links
+are recorded in the [README](README.md), the public
+[W&B report](https://wandb.ai/trandainien1/graphml-momok-reproduction/reports/MoMoK-—-Main-Result-Reproduction--VmlldzoxODA0ODgwMw==),
+and `IMPLEMENTATION_REVIEW.md`.
+
+The ablations are operational variants, not claims of exact equivalence to
+every Table 2 protocol detail. The single-seed results are descriptive and do
+not estimate variance. Other defined variants and sweeps are implemented as
+contracts/configuration surfaces but have not all been run.
 
 ## Variant semantics
 
@@ -62,5 +73,7 @@ python -m unittest discover -s tests -v
 python -m py_compile models/RelMoE.py train.py utils/data_loader.py ablations/*.py
 ```
 
-The host environment does not import PyTorch, so GPU/model smoke tests must
-run later in a matching Torch/Kaggle environment.
+The repository's lightweight unit suite covers configuration, variant
+contracts, checkpoint wiring, publication schemas, and report structure.
+Full experiments execute on Kaggle; see `KAGGLE_RECOVERY.md` for recovery
+workflow and the README for commands and results.

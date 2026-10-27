@@ -9,6 +9,7 @@ import io
 import json
 import os
 from pathlib import Path
+import subprocess
 
 import wandb
 import wandb_workspaces.reports.v2 as wr
@@ -24,6 +25,8 @@ TITLE = "MoMoK — Main Result Reproduction"
 SOURCE = "https://github.com/zjukg/MoMoK"
 PUBLIC_REPO = "https://github.com/trandainien1/MoMoK"
 PUBLIC_TAG = "https://github.com/trandainien1/MoMoK/tree/course-momok-main-results-v1"
+PUBLIC_BRANCH = "https://github.com/trandainien1/MoMoK/tree/course-reproduction"
+PUBLIC_README = "https://github.com/trandainien1/MoMoK/blob/course-reproduction/README.md"
 COMMIT = "99c2df114d48c79708ea0608644b685183d81bd9"
 MKGW = "k2evocuw"
 MKGY = "tp1184w7"
@@ -117,6 +120,39 @@ def ablation_blocks() -> list:
             f"{variant['history_points']} observed history points; retrospective import."
         )
 
+    observations = """
+### Observations
+
+Compared with the Full Model (Proposed Method), `no_gating_noise` has a
+maximum absolute difference of 0.0016020590 (Hits@3). `no_exid` has a maximum
+difference of 0.0053945718 (Hits@10), while its MRR is 0.0005488296 lower.
+All four terminal summary values for `no_relation_temperature` are higher
+than the baseline values; its maximum difference is 0.0095945718 (Hits@10).
+These are descriptive one-seed observations, not a statistical or causal
+ranking. Each terminal metric follows the legacy best-per-metric policy.
+"""
+
+    ablation_reproduction = f"""
+### Reproduce the MKG-W ablations
+
+The [public course-reproduction branch]({PUBLIC_BRANCH}) contains the
+variant-specific notebook folders, build/validation commands, output
+recovery steps, and W&B publication instructions in its [README]({PUBLIC_README}).
+The notebooks pin upstream commit `{COMMIT}`. In brief, build each full notebook
+with `scripts/build_ablation_kaggle_notebook.py`, validate it with
+`scripts/validate_ablation_kaggle_notebook.py <notebook-path>`, and push the
+folder using `kaggle kernels push -p <kernel-folder>` after confirming that
+the metadata owner matches the authenticated Kaggle account. Inspect dataset
+validation and smoke checks before allowing the full 2,000-epoch run.
+
+Monitor with `kaggle kernels logs` and `kaggle kernels status`; retrieve
+outputs with `kaggle kernels output`. Parse only observed metrics using
+`scripts/parse_momok_ablation_log.py`. These published W&B runs are
+retrospective imports. The publisher is intentionally restricted to the
+three registered historical variants; a new run requires a separate reviewed
+W&B run ID and provenance. Credentials remain local-only.
+"""
+
     panels = [
         wr.LinePlot(title="MKG-W ablation MRR", x="epoch", y=["eval/MRR"], title_x="Epoch"),
         wr.LinePlot(title="MKG-W ablation Hits@1", x="epoch", y=["eval/Hits@1"], title_x="Epoch"),
@@ -139,6 +175,8 @@ not claimed.
         wr.PanelGrid(runsets=[ablation_runset()], panels=panels),
         markdown("\n".join(lines)),
         markdown("\n".join(provenance_lines)),
+        markdown(observations),
+        markdown(ablation_reproduction),
     ]
 
 
@@ -179,6 +217,9 @@ Runs: [MKG-W](https://wandb.ai/{ENTITY}/{PROJECT}/runs/{MKGW}) · [MKG-Y](https:
 **Official implementation:** [zjukg/MoMoK]({SOURCE})
 
 **Public reproduction repository:** [{PUBLIC_REPO}]({PUBLIC_REPO})
+
+**Current reproduction branch with MKG-W/MKG-Y workflows and MKG-W
+ablations:** [{PUBLIC_BRANCH}]({PUBLIC_BRANCH})
 
 **Pinned upstream commit:** [`{COMMIT}`]({SOURCE}/commit/{COMMIT})
 
@@ -284,7 +325,7 @@ binary is not uploaded to the W&B artifact; only its hash and provenance are.
 ```bash
 git clone {PUBLIC_REPO}.git
 cd MoMoK
-git checkout course-momok-main-results-v1
+git checkout course-reproduction
 ```
 
 Then configure the local Python/Kaggle environment, create the ignored
@@ -310,6 +351,16 @@ the pinned source and dataset before smoke testing, trains the configured
 full-model run, writes full-state checkpoints, evaluates the final epoch, and
 exports safe evidence. Credentials remain local-only; no raw credential or
 access-token URL is part of this report.
+
+For the three MKG-W ablations, use the separate notebook folders and
+variant-specific build/validation commands documented in the [public
+README]({PUBLIC_README}). The full ablation run requires MKG-W dataset
+validation and the notebook's smoke checks to pass. After Kaggle completes,
+download its output, parse the observed log with
+`scripts/parse_momok_ablation_log.py`, and use
+`scripts/publish_momok_mkgw_ablation_wandb.py` only for one of its three
+registered historical variants. Those W&B runs are retrospective imports;
+the README explains how to assign a new run ID when publishing a new rerun.
 """),
     ]
 
@@ -375,7 +426,7 @@ def main() -> None:
     metadata = json.loads(META.read_text())
     report = wr.Report.from_url(metadata["report_url"])
     report.title = TITLE
-    report.description = "Public main-result evidence for the completed MoMoK MKG-W and MKG-Y reproductions."
+    report.description = "Public main-result and selected MKG-W ablation evidence, with reproduction instructions and provenance."
     report.blocks = blocks()
     report.width = "fluid"
     with contextlib.redirect_stdout(io.StringIO()):
@@ -403,11 +454,16 @@ def main() -> None:
         "temporary_http_app_shell_status": 200,
         "dynamic_visual_render_status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
         "public_reproduction_repository": PUBLIC_REPO,
+        "public_reproduction_branch_url": PUBLIC_BRANCH,
+        "public_readme_url": PUBLIC_README,
         "stable_reproduction_tag": "course-momok-main-results-v1",
         "publication_branch": "course-reproduction",
-        "publication_commit": "0be7453e42e34277eb023e2ee3d1e5d3dc7672cf",
+        "publication_commit": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip(),
+        "ablation_observations_and_reproduction_guide": True,
+        "readme_contains_experiment_summary": True,
         "mkgw_runset_contexts": 1,
-        "mkgy_training_loss_changed": False,
     }, indent=2, ensure_ascii=False) + "\n")
     print(report.url)
 
