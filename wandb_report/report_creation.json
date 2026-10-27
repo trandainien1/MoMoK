@@ -53,8 +53,12 @@
   "temporary_http_app_shell_status": 200,
   "dynamic_visual_render_status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
   "public_reproduction_repository": "https://github.com/trandainien1/MoMoK",
+  "public_reproduction_branch_url": "https://github.com/trandainien1/MoMoK/tree/course-reproduction",
+  "public_readme_url": "https://github.com/trandainien1/MoMoK/blob/course-reproduction/README.md",
   "stable_reproduction_tag": "course-momok-main-results-v1",
   "publication_branch": "course-reproduction",
-  "publication_commit": "0be7453e42e34277eb023e2ee3d1e5d3dc7672cf",
+  "publication_commit": "557fd90f647352b86223aae0779a84b60f83ecc3",
+  "ablation_observations_and_reproduction_guide": true,
+  "readme_contains_experiment_summary": true,
   "mkgw_runset_contexts": 1
 }

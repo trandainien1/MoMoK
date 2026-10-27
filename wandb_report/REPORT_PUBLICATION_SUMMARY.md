@@ -47,3 +47,31 @@
 - MKG-W run selector context: one `PanelGrid` runset context
 - MKG-Y training-loss panel: unchanged
 - Reproduction procedure: starts from public Git clone and stable tag
+
+## Course branch and README update
+
+- Current public branch: https://github.com/trandainien1/MoMoK/tree/course-reproduction
+- README: https://github.com/trandainien1/MoMoK/blob/course-reproduction/README.md
+- README scope: main-result metrics for MKG-W/MKG-Y; the Full Model (Proposed
+  Method) baseline row; three MKG-W operational ablations; descriptive
+  observations, exact run links, and reproducibility steps.
+- W&B report additions: current branch and README links; descriptive ablation
+  notes; ablation-specific build, validation, Kaggle execution, output, and
+  retrospective publication workflow.
+- The existing report object and canonical URL are preserved. No W&B run
+  history, metrics, or charts are intentionally changed.
+- Ablation interpretation remains qualified as one-seed descriptive evidence;
+  the paper's exact Table 2 protocol equivalence is not claimed.
+- Dynamic report rendering in an authenticated browser remains a human visual
+  check because browser automation is unavailable in this environment.
+- Report was updated in place on 2026-10-27; the canonical URL and report ID
+  remain unchanged. GitHub branch commit at update time:
+  `557fd90f647352b86223aae0779a84b60f83ecc3`.
+- Fetched W&B report spec confirms the seven expected sections, the exact
+  selected run IDs (`k2evocuw`, `tp1184w7`, `mkgwngn1`, `mkgwnex1`,
+  `mkgwnrt1`), README link, observations, and ablation reproduction guide.
+- No raw run-ID filter appears in the spec. The serialized MKG-Y training-loss
+  panel hash matches the pre-update report spec exactly.
+- Anonymous HTTP checks returned 200 without login redirects for the report,
+  project, public course branch, and README. This does not substitute for a
+  dynamic browser visual check.
